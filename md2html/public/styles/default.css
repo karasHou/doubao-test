@@ -1,0 +1,233 @@
+/* Default styles for md2html-cli */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f8f9fa;
+}
+
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Header styles */
+.header {
+    text-align: center;
+    margin-bottom: 40px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #212529;
+    margin-bottom: 10px;
+}
+
+.meta {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+/* Content styles */
+.content {
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Typography */
+.content h1,
+.content h2,
+.content h3,
+.content h4,
+.content h5,
+.content h6 {
+    margin-top: 30px;
+    margin-bottom: 15px;
+    font-weight: 600;
+    color: #212529;
+    line-height: 1.3;
+}
+
+.content h1 {
+    font-size: 2rem;
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 10px;
+}
+
+.content h2 {
+    font-size: 1.5rem;
+    border-bottom: 1px solid #e9ecef;
+    padding-bottom: 8px;
+}
+
+.content h3 {
+    font-size: 1.25rem;
+}
+
+.content h4 {
+    font-size: 1.1rem;
+}
+
+.content p {
+    margin-bottom: 15px;
+    text-align: justify;
+}
+
+/* Lists */
+.content ul,
+.content ol {
+    margin-bottom: 15px;
+    padding-left: 25px;
+}
+
+.content li {
+    margin-bottom: 8px;
+}
+
+.content li > ul,
+.content li > ol {
+    margin-top: 8px;
+    margin-bottom: 0;
+}
+
+/* Code blocks */
+.content pre {
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 4px;
+    padding: 15px;
+    margin-bottom: 15px;
+    overflow-x: auto;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.content code {
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 3px;
+    padding: 2px 6px;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 0.9rem;
+    color: #dc3545;
+}
+
+.content pre code {
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    color: #333;
+}
+
+/* Blockquotes */
+.content blockquote {
+    border-left: 4px solid #007bff;
+    padding-left: 15px;
+    margin-bottom: 15px;
+    color: #6c757d;
+    font-style: italic;
+}
+
+/* Links */
+.content a {
+    color: #007bff;
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: all 0.2s ease;
+}
+
+.content a:hover {
+    color: #0056b3;
+    border-bottom-color: #0056b3;
+}
+
+/* Tables */
+.content table {
+    width: 100%;
+    margin-bottom: 15px;
+    border-collapse: collapse;
+    border: 1px solid #e9ecef;
+}
+
+.content th,
+.content td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.content th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    color: #212529;
+}
+
+.content tr:last-child td {
+    border-bottom: none;
+}
+
+/* Images */
+.content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+    margin-bottom: 15px;
+    display: block;
+}
+
+/* Horizontal rules */
+.content hr {
+    border: none;
+    border-top: 2px solid #e9ecef;
+    margin: 30px 0;
+}
+
+/* Footer styles */
+.footer {
+    text-align: center;
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #e9ecef;
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+
+    .header h1 {
+        font-size: 2rem;
+    }
+
+    .content {
+        padding: 20px;
+    }
+
+    .content h1 {
+        font-size: 1.75rem;
+    }
+
+    .content h2 {
+        font-size: 1.5rem;
+    }
+
+    .content h3 {
+        font-size: 1.25rem;
+    }
+}

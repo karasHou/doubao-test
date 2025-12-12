@@ -1,0 +1,27 @@
+{
+  "name": "md2html-cli",
+  "version": "1.0.0",
+  "description": "A cross-platform CLI tool to convert Markdown to HTML",
+  "main": "index.js",
+  "bin": {
+    "md2html": "./bin/md2html.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "markdown",
+    "html",
+    "cli",
+    "converter"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "chokidar": "^3.5.3",
+    "commander": "^10.0.0",
+    "glob": "^9.3.2",
+    "highlight.js": "^11.7.0",
+    "marked": "^4.3.0"
+  }
+}
