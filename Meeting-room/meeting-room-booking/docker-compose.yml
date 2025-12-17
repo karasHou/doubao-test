@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:14-alpine
+    container_name: meeting-booking-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: meeting_booking
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - meeting-booking-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: meeting-booking-backend
+    restart: unless-stopped
+    environment:
+      PORT: 5001
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: meeting_booking
+      DB_USER: postgres
+      DB_PASSWORD: password
+      JWT_SECRET: meeting-booking-secret-key
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    ports:
+      - "5001:5001"
+    depends_on:
+      - postgres
+    networks:
+      - meeting-booking-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: meeting-booking-frontend
+    restart: unless-stopped
+    environment:
+      REACT_APP_API_URL: http://localhost:5001/api
+      REACT_APP_SOCKET_URL: http://localhost:5001
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - meeting-booking-network
+
+volumes:
+  postgres_data:
+
+networks:
+  meeting-booking-network:
+    driver: bridge
