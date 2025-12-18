@@ -1,0 +1,112 @@
+version: '3.8'
+
+services:
+  # PostgreSQL 数据库
+  postgres:
+    image: postgres:15
+    container_name: ticket-system-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: ticket_system
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - '5435:5432'
+    networks:
+      - ticket-system-network
+
+  # Elasticsearch
+  elasticsearch:
+    image: elasticsearch:8.11.0
+    container_name: ticket-system-elasticsearch
+    restart: unless-stopped
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+      - xpack.security.enabled=false
+      - xpack.security.enrollment.enabled=false
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    ports:
+      - '9201:9200'
+      - '9301:9300'
+    networks:
+      - ticket-system-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Kibana（可选，用于 Elasticsearch 管理）
+  kibana:
+    image: kibana:8.11.0
+    container_name: ticket-system-kibana
+    restart: unless-stopped
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - XPACK_SECURITY_ENABLED=false
+    ports:
+      - '5602:5601'
+    networks:
+      - ticket-system-network
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+
+  # 后端 NestJS 服务
+  backend:
+    build: ./backend
+    container_name: ticket-system-backend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USERNAME: postgres
+      DB_PASSWORD: password
+      DB_NAME: ticket_system
+      ELASTICSEARCH_NODE: http://elasticsearch:9200
+      ELASTICSEARCH_USERNAME: elastic
+      ELASTICSEARCH_PASSWORD: elastic
+    ports:
+      - '3005:3001'
+    networks:
+      - ticket-system-network
+    depends_on:
+      postgres:
+        condition: service_started
+      elasticsearch:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+
+  # 前端 Vue3 应用
+  frontend:
+    build: ./frontend
+    container_name: ticket-system-frontend
+    restart: unless-stopped
+    ports:
+      - '3004:80'
+    networks:
+      - ticket-system-network
+    depends_on:
+      backend:
+        condition: service_started
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+# 数据卷
+volumes:
+  postgres_data:
+  elasticsearch_data:
+
+# 网络
+networks:
+  ticket-system-network:
+    driver: bridge
