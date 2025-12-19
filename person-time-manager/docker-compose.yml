@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  # PostgreSQL 数据库
+  postgres:
+    image: postgres:15
+    container_name: time-manager-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: time_manager
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - '5436:5432'
+    networks:
+      - time-manager-network
+
+  # 后端 Node.js 服务
+  backend:
+    build: ./backend
+    container_name: time-manager-backend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USERNAME: postgres
+      DB_PASSWORD: password
+      DB_NAME: time_manager
+    ports:
+      - '3007:3001'
+    networks:
+      - time-manager-network
+    depends_on:
+      postgres:
+        condition: service_started
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+
+  # 前端 React 应用
+  frontend:
+    build: ./frontend
+    container_name: time-manager-frontend
+    restart: unless-stopped
+    ports:
+      - '3006:3000'
+    networks:
+      - time-manager-network
+    depends_on:
+      backend:
+        condition: service_started
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+# 数据卷
+volumes:
+  postgres_data:
+
+# 网络
+networks:
+  time-manager-network:
+    driver: bridge
