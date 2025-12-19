@@ -1,0 +1,94 @@
+# 开发环境配置 - 避免构建问题，使用开发模式
+version: '3.8'
+
+services:
+  # PostgreSQL 数据库服务
+  postgres:
+    image: postgres:14-alpine
+    container_name: recipe-postgres-dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: recipe_management
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/00_schema.sql
+    ports:
+      - '5433:5432'
+    networks:
+      - recipe-network-dev
+
+  # Redis 缓存服务
+  redis:
+    image: redis:7-alpine
+    container_name: recipe-redis-dev
+    restart: unless-stopped
+    volumes:
+      - redis_data_dev:/data
+    ports:
+      - '6381:6379'
+    networks:
+      - recipe-network-dev
+
+  # NestJS 后端服务 - 使用开发模式
+  backend:
+    image: node:18-alpine
+    container_name: recipe-backend-dev
+    restart: unless-stopped
+    working_dir: /app
+    environment:
+      NODE_ENV: development
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: recipe_management
+      DB_USERNAME: postgres
+      DB_PASSWORD: password
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_DB: 0
+      PORT: 3000
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    command: sh -c "npm install && npm run start"
+    ports:
+      - '3004:3000'
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - recipe-network-dev
+
+  # Vue3 前端服务 - 使用开发模式
+  frontend:
+    image: node:18-alpine
+    container_name: recipe-frontend-dev
+    restart: unless-stopped
+    working_dir: /app
+    environment:
+      NODE_ENV: development
+      VITE_API_BASE_URL: http://localhost:3004/api
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    command: sh -c "npm install && npm run dev"
+    ports:
+      - '5174:5173'
+    depends_on:
+      - backend
+    networks:
+      - recipe-network-dev
+
+# 数据卷定义
+volumes:
+  postgres_data_dev:
+    name: recipe-postgres-data-dev
+  redis_data_dev:
+    name: recipe-redis-data-dev
+
+# 网络定义
+networks:
+  recipe-network-dev:
+    name: recipe-network-dev
+    driver: bridge
