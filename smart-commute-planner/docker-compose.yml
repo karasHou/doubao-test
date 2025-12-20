@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "3002:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    networks:
+      - commute-network
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "8080:80"
+    volumes:
+      - ./frontend:/app
+    networks:
+      - commute-network
+
+  postgres:
+    image: postgres:13
+    environment:
+      - POSTGRES_DB=commute
+      - POSTGRES_USER=commute_user
+      - POSTGRES_PASSWORD=commute_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - commute-network
+
+  redis:
+    image: redis:6
+    volumes:
+      - redis_data:/data
+    networks:
+      - commute-network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  commute-network:
