@@ -1,0 +1,50 @@
+version: '3.8'
+services:
+  backend:
+    build: ./backend
+    container_name: parking-backend
+    ports:
+      - "3004:3000"
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - parking-network
+
+  frontend:
+    build: ./frontend
+    container_name: parking-frontend
+    ports:
+      - "5174:5173"
+    networks:
+      - parking-network
+
+  postgres:
+    image: postgres:15
+    container_name: parking-db
+    environment:
+      POSTGRES_DB: parking_db
+      POSTGRES_USER: parking_user
+      POSTGRES_PASSWORD: parking_pass
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - parking-network
+
+  redis:
+    image: redis:7
+    container_name: parking-redis
+    volumes:
+      - redis_data:/data
+    networks:
+      - parking-network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  parking-network:
