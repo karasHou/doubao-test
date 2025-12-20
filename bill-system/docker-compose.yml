@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:13
+    container_name: bill-db
+    environment:
+      POSTGRES_DB: bill_db
+      POSTGRES_USER: bill_user
+      POSTGRES_PASSWORD: bill_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - bill-network
+
+  redis:
+    image: redis:6-alpine
+    container_name: bill-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - bill-network
+
+  backend:
+    build: ./backend
+    container_name: bill-backend
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: bill_db
+      DB_USER: bill_user
+      DB_PASSWORD: bill_password
+      REDIS_URL: redis://redis:6379
+      NODE_ENV: production
+    ports:
+      - "3001:3001"
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - bill-network
+
+  frontend:
+    build: ./frontend
+    container_name: bill-frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - bill-network
+
+volumes:
+  postgres_data:
+
+networks:
+  bill-network:
+    driver: bridge
