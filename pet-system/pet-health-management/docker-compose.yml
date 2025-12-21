@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: pethealth-db
+    environment:
+      POSTGRES_DB: pethealth
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  backend:
+    build: ./backend
+    container_name: pethealth-backend
+    environment:
+      DB_HOST: db
+      DB_NAME: pethealth
+      DB_USER: postgres
+      DB_PASSWORD: password
+      DB_PORT: 5432
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    container_name: pethealth-frontend
+    ports:
+      - "8081:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
