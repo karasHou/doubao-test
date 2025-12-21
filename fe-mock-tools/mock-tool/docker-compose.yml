@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "3002:3002"
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ./backend:/app
+    command: npm start
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ./frontend:/app
+    command: npm run dev
+
+  # PostgreSQL 数据库（预留）
+  db:
+    image: postgres:13
+    environment:
+      - POSTGRES_USER=mockuser
+      - POSTGRES_PASSWORD=mockpass
+      - POSTGRES_DB=mockdb
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # Redis 缓存（预留）
+  redis:
+    image: redis:6
+    ports:
+      - "6379:6379"
+
+volumes:
+  postgres_data:
